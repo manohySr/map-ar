@@ -20,6 +20,9 @@ importers:
       mind-ar-react:
         specifier: ^0.1.1
         version: 0.1.1(aframe@1.6.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      polyline:
+        specifier: ^0.2.0
+        version: 0.2.0
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -1235,6 +1238,10 @@ packages:
 
   picocolors@1.0.1:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
+
+  polyline@0.2.0:
+    resolution: {integrity: sha512-rCJSkIHWZ/HOUoEWgjZ1DrRjLpTeTjgaktyJV0yhm8PugM5sKoavNjUHtI/amjsTn/Tq+Q3IIAuBD/dUSsWwxQ==}
+    deprecated: 'This module is now under the @mapbox namespace: install @mapbox/polyline instead'
 
   possible-typed-array-names@1.0.0:
     resolution: {integrity: sha512-d7Uw+eZoloe0EHDIYoe+bQ5WXnGMOpmiZFTuMWCwpjzzkL2nTjcKiAk4hh8TjnGye2TwWOk3UXucZ+3rbmBa8Q==}
@@ -2804,6 +2811,8 @@ snapshots:
   phin@2.9.3: {}
 
   picocolors@1.0.1: {}
+
+  polyline@0.2.0: {}
 
   possible-typed-array-names@1.0.0: {}
 

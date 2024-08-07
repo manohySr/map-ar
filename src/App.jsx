@@ -2,24 +2,45 @@ import { useState } from "react";
 import "./App.css";
 
 function App() {
+  const [origin, setOrigin] = useState(null);
+  const [destination, setDestination] = useState(null);
   const [position, setPosition] = useState([-18.9005824, 47.529984]);
-  const [zoom, setZoom] = useState(13); // Initialize zoom level
+  const [zoom, setZoom] = useState(13);
+  const [route, setRoute] = useState(null);
 
   return (
     <>
-      <Search setPosition={setPosition} setZoom={setZoom} />
-      <MapComponent position={position} zoom={zoom} />
+      <Search
+        setOrigin={setOrigin}
+        setDestination={setDestination}
+        setPosition={setPosition}
+        setZoom={setZoom}
+        setRoute={setRoute}
+      />
+      <MapComponent
+        position={position}
+        zoom={zoom}
+        origin={origin}
+        destination={destination}
+        route={route}
+      />
     </>
   );
 }
 
 export default App;
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Polyline,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useRef, useEffect } from "react";
 
-function MapComponent({ position, zoom }) {
+function MapComponent({ position, zoom, origin, destination, route }) {
   const mapRef = useRef(null);
 
   useEffect(() => {
@@ -41,19 +62,26 @@ function MapComponent({ position, zoom }) {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      <Marker position={position}>
-        <Popup>You are here.</Popup>
-      </Marker>
+      {origin && (
+        <Marker position={origin}>
+          <Popup>Origin</Popup>
+        </Marker>
+      )}
+      {destination && (
+        <Marker position={destination}>
+          <Popup>Destination</Popup>
+        </Marker>
+      )}
+      {route && <Polyline positions={route} color="blue" />}
     </MapContainer>
   );
 }
 
-
-
 const styleSearch = {
   display: "flex",
+  flexDirection: "column",
   margin: "1rem",
-  gap: ".5rem"
+  gap: ".5rem",
 };
 
 const styleInput = {
@@ -61,19 +89,47 @@ const styleInput = {
   fontSize: "1rem",
 };
 
-function Search({ setPosition, setZoom }) {
-  const [searching, setSearching] = useState("");
+function Search({ setOrigin, setDestination, setPosition, setZoom, setRoute }) {
+  const [originSearch, setOriginSearch] = useState("");
+  const [destinationSearch, setDestinationSearch] = useState("");
 
   async function handleSearch() {
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${searching}`
+      const originResponse = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${originSearch}`
       );
-      const jsonData = await response.json();
-      if (jsonData.length > 0) {
-        const newPosition = [jsonData[0].lat, jsonData[0].lon];
-        setPosition(newPosition);
-        setZoom(16); // Adjust zoom level when a new location is found
+      const originData = await originResponse.json();
+      const destinationResponse = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${destinationSearch}`
+      );
+      const destinationData = await destinationResponse.json();
+
+      if (originData.length > 0 && destinationData.length > 0) {
+        const newOrigin = [
+          parseFloat(originData[0].lat),
+          parseFloat(originData[0].lon),
+        ];
+        const newDestination = [
+          parseFloat(destinationData[0].lat),
+          parseFloat(destinationData[0].lon),
+        ];
+
+        setOrigin(newOrigin);
+        setDestination(newDestination);
+        setPosition(newOrigin);
+        setZoom(13); // Adjust zoom level when new locations are found
+
+        const routeResponse = await fetch(
+          `https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf6248a6319147896841859c8bf8f1b950c7ee&start=${newOrigin[1]},${newOrigin[0]}&end=${newDestination[1]},${newDestination[0]}`
+        );
+        const routeData = await routeResponse.json();
+        const coordinates = routeData.features[0].geometry.coordinates.map(
+          (coord) => {
+            console.log([coord[1], coord[0]]);
+            return [coord[1], coord[0]];
+          }
+        );
+        setRoute(coordinates);
       } else {
         alert("No results found");
       }
@@ -87,9 +143,16 @@ function Search({ setPosition, setZoom }) {
       <input
         style={styleInput}
         type="text"
-        value={searching}
-        onChange={(e) => setSearching(e.target.value)}
-        placeholder="Search..."
+        value={originSearch}
+        onChange={(e) => setOriginSearch(e.target.value)}
+        placeholder="Origin..."
+      />
+      <input
+        style={styleInput}
+        type="text"
+        value={destinationSearch}
+        onChange={(e) => setDestinationSearch(e.target.value)}
+        placeholder="Destination..."
       />
       <button onClick={handleSearch}>Search</button>
     </div>
