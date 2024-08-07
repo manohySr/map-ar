@@ -120,7 +120,7 @@ function Search({ setOrigin, setDestination, setPosition, setZoom, setRoute }) {
         setZoom(13); // Adjust zoom level when new locations are found
 
         const routeResponse = await fetch(
-          `https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf6248a6319147896841859c8bf8f1b950c7ee&start=${newOrigin[1]},${newOrigin[0]}&end=${newDestination[1]},${newDestination[0]}`
+          `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${import.meta.env.VITE_API_KEY}&start=${newOrigin[1]},${newOrigin[0]}&end=${newDestination[1]},${newDestination[0]}`
         );
         const routeData = await routeResponse.json();
         const coordinates = routeData.features[0].geometry.coordinates.map(
