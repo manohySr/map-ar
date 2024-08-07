@@ -92,6 +92,7 @@ const styleInput = {
 function Search({ setOrigin, setDestination, setPosition, setZoom, setRoute }) {
   const [originSearch, setOriginSearch] = useState("");
   const [destinationSearch, setDestinationSearch] = useState("");
+  const [distance, setDistance] = useState(null);
 
   async function handleSearch() {
     try {
@@ -120,16 +121,27 @@ function Search({ setOrigin, setDestination, setPosition, setZoom, setRoute }) {
         setZoom(13); // Adjust zoom level when new locations are found
 
         const routeResponse = await fetch(
-          `https://api.openrouteservice.org/v2/directions/driving-car?api_key=${import.meta.env.VITE_API_KEY}&start=${newOrigin[1]},${newOrigin[0]}&end=${newDestination[1]},${newDestination[0]}`
+          `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=${
+            import.meta.env.VITE_API_KEY
+          }&start=${newOrigin[1]},${newOrigin[0]}&end=${newDestination[1]},${
+            newDestination[0]
+          }`
         );
         const routeData = await routeResponse.json();
         const coordinates = routeData.features[0].geometry.coordinates.map(
-          (coord) => {
-            console.log([coord[1], coord[0]]);
+          function (coord) {
             return [coord[1], coord[0]];
           }
         );
+
+        const routeDistance =
+          routeData.features[0].properties.segments[0].distance;
         setRoute(coordinates);
+        setDistance(routeDistance);
+
+        console.log(
+          `Most efficient itinerary distance: ${routeDistance} meters`
+        );
       } else {
         alert("No results found");
       }
@@ -155,6 +167,7 @@ function Search({ setOrigin, setDestination, setPosition, setZoom, setRoute }) {
         placeholder="Destination..."
       />
       <button onClick={handleSearch}>Search</button>
+      {distance && <p>Distance: {distance} meters</p>}
     </div>
   );
 }
