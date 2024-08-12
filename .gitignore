@@ -13,6 +13,11 @@ dist-ssr
 *.local
 
 .env
+*.key
+*.pem
+*.crt
+*.csr
+ssl/
 
 # Editor directories and files
 .vscode/*

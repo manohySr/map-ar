@@ -147,7 +147,7 @@ function Search({ origin, setDestination, setPosition, setZoom, setRoute }) {
 
         setDestination(newDestination);
         setPosition(newDestination);
-        setZoom(13); // Adjust zoom level when a new location is found
+        setZoom(15); // Adjust zoom level when a new location is found
 
         const routeResponse = await fetch(
           `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=${
