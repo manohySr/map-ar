@@ -9,6 +9,13 @@ const headerSearch = {
   zIndex: "1000",
 };
 
+const arButton = {
+  position: "absolute",
+  bottom: "1rem",
+  left: "1rem",
+  zIndex: "1000",
+}
+
 function App() {
   const [origin, setOrigin] = useState(null);
   const [destination, setDestination] = useState(null);
@@ -54,6 +61,7 @@ function App() {
         destination={destination}
         route={route}
       />
+      <button style={arButton}>AR</button>
     </>
   );
 }
@@ -120,7 +128,7 @@ const styleInput = {
   padding: "0.8em 1.2em",
   fontSize: "1em",
   background: "white",
-  color: "#000"
+  color: "#000",
 };
 
 function Search({ origin, setDestination, setPosition, setZoom, setRoute }) {
@@ -189,7 +197,7 @@ function Search({ origin, setDestination, setPosition, setZoom, setRoute }) {
         placeholder="Destination..."
       />
       <button onClick={handleSearch}>Search</button>
-      {distance && <p style={{color: "#000"}}>Distance: {distance} meters</p>}
+      {distance && <p style={{ color: "#000" }}>Distance: {distance} meters</p>}
     </div>
   );
 }
