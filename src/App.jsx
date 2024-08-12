@@ -4,7 +4,7 @@ import "./App.css";
 const headerSearch = {
   position: "absolute",
   top: "0",
-  left: "3rem",
+  right: "1rem",
   width: "80%",
   zIndex: "1000",
 };
