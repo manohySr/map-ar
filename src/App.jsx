@@ -189,7 +189,7 @@ function Search({ origin, setDestination, setPosition, setZoom, setRoute }) {
         placeholder="Destination..."
       />
       <button onClick={handleSearch}>Search</button>
-      {distance && <p>Distance: {distance} meters</p>}
+      {distance && <p style={{color: "#000"}}>Distance: {distance} meters</p>}
     </div>
   );
 }
