@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./App.css";
+import ARComponent from "./ARComponent";
 
 const headerSearch = {
   position: "absolute",
@@ -21,6 +22,7 @@ function App() {
   const [destination, setDestination] = useState(null);
   const [zoom, setZoom] = useState(13);
   const [route, setRoute] = useState(null);
+  const [showAR, setShowAR] = useState(false);
 
   useEffect(() => {
     // Get the user's current location when the component mounts
@@ -43,21 +45,32 @@ function App() {
 
   return (
     <>
-      <div style={headerSearch}>
-        <Search
-          origin={origin}
-          setDestination={setDestination}
-          setZoom={setZoom}
-          setRoute={setRoute}
-        />
-      </div>
-      <MapComponent
-        zoom={zoom}
-        origin={origin}
-        destination={destination}
-        route={route}
-      />
-      <button style={arButton}>AR</button>
+      {showAR ? (
+        <ARComponent destination={destination} />
+      ) : (
+        <>
+          <div style={headerSearch}>
+            <Search
+              origin={origin}
+              setDestination={setDestination}
+              setZoom={setZoom}
+              setRoute={setRoute}
+            />
+          </div>
+          <MapComponent
+            zoom={zoom}
+            origin={origin}
+            destination={destination}
+            route={route}
+          />
+        </>
+      )}
+      <button
+        style={arButton}
+        onClick={() => setShowAR((prevShowAR) => !prevShowAR)}
+      >
+        {showAR ? "Back to Map" : "AR"}
+      </button>
     </>
   );
 }
@@ -128,7 +141,6 @@ const styleInput = {
   color: "#000",
 };
 
-
 function Search({ origin, setDestination, setZoom, setRoute }) {
   const [destinationSearch, setDestinationSearch] = useState("");
   const [distance, setDistance] = useState(null);
@@ -198,4 +210,3 @@ function Search({ origin, setDestination, setZoom, setRoute }) {
     </div>
   );
 }
-
