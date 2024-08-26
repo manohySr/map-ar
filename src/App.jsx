@@ -14,12 +14,11 @@ const arButton = {
   bottom: "1rem",
   left: "1rem",
   zIndex: "1000",
-}
+};
 
 function App() {
   const [origin, setOrigin] = useState(null);
   const [destination, setDestination] = useState(null);
-  const [position, setPosition] = useState([-18.9005824, 47.529984]);
   const [zoom, setZoom] = useState(13);
   const [route, setRoute] = useState(null);
 
@@ -32,7 +31,6 @@ function App() {
           const longitude = position.coords.longitude;
           const userPosition = [latitude, longitude];
           setOrigin(userPosition);
-          setPosition(userPosition);
         },
         (error) => {
           console.error(`Error Code = ${error.code}: ${error.message}`);
@@ -49,13 +47,11 @@ function App() {
         <Search
           origin={origin}
           setDestination={setDestination}
-          setPosition={setPosition}
           setZoom={setZoom}
           setRoute={setRoute}
         />
       </div>
       <MapComponent
-        position={position}
         zoom={zoom}
         origin={origin}
         destination={destination}
@@ -68,6 +64,7 @@ function App() {
 
 export default App;
 
+import { useRef } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -76,20 +73,19 @@ import {
   Polyline,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { useRef } from "react";
 
-function MapComponent({ position, zoom, origin, destination, route }) {
+function MapComponent({ zoom, origin, destination, route }) {
   const mapRef = useRef(null);
 
   useEffect(() => {
-    if (mapRef.current) {
-      mapRef.current.setView(position, zoom);
+    if (mapRef.current && origin) {
+      mapRef.current.setView(origin, zoom);
     }
-  }, [position, zoom]);
+  }, [origin, zoom]);
 
   return (
     <MapContainer
-      center={position}
+      center={origin || [0, 0]} // Fallback center in case origin is not available yet
       zoom={zoom}
       style={{ height: "100vh", width: "100vw" }}
       whenReady={(map) => {
@@ -110,6 +106,7 @@ function MapComponent({ position, zoom, origin, destination, route }) {
           <Popup>Destination</Popup>
         </Marker>
       )}
+      {console.log(route)}
       {route && <Polyline positions={route} color="blue" />}
     </MapContainer>
   );
@@ -131,7 +128,8 @@ const styleInput = {
   color: "#000",
 };
 
-function Search({ origin, setDestination, setPosition, setZoom, setRoute }) {
+
+function Search({ origin, setDestination, setZoom, setRoute }) {
   const [destinationSearch, setDestinationSearch] = useState("");
   const [distance, setDistance] = useState(null);
 
@@ -147,43 +145,42 @@ function Search({ origin, setDestination, setPosition, setZoom, setRoute }) {
       );
       const destinationData = await destinationResponse.json();
 
-      if (destinationData.length > 0) {
-        const newDestination = [
-          parseFloat(destinationData[0].lat),
-          parseFloat(destinationData[0].lon),
-        ];
-
-        setDestination(newDestination);
-        setPosition(newDestination);
-        setZoom(15); // Adjust zoom level when a new location is found
-
-        const routeResponse = await fetch(
-          `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=${
-            import.meta.env.VITE_API_KEY
-          }&start=${origin[1]},${origin[0]}&end=${newDestination[1]},${
-            newDestination[0]
-          }`
-        );
-        const routeData = await routeResponse.json();
-        const coordinates = routeData.features[0].geometry.coordinates.map(
-          function (coord) {
-            return [coord[1], coord[0]];
-          }
-        );
-
-        const routeDistance =
-          routeData.features[0].properties.segments[0].distance;
-        setRoute(coordinates);
-        setDistance(routeDistance);
-
-        console.log(
-          `Most efficient itinerary distance: ${routeDistance} meters`
-        );
-      } else {
-        alert("No results found");
+      if (destinationData.length === 0) {
+        alert("No results found.");
+        return;
       }
+
+      const [lat, lon] = [
+        parseFloat(destinationData[0].lat),
+        parseFloat(destinationData[0].lon),
+      ];
+      const newDestination = [lat, lon];
+
+      setDestination(newDestination);
+      setZoom(15); // Adjust zoom level when a new location is found
+
+      const routeResponse = await fetch(
+        `https://api.openrouteservice.org/v2/directions/foot-walking?api_key=${
+          import.meta.env.VITE_API_KEY
+        }&start=${origin[1]},${origin[0]}&end=${newDestination[1]},${
+          newDestination[0]
+        }`
+      );
+
+      const routeData = await routeResponse.json();
+      const coordinates = routeData.features[0].geometry.coordinates.map(
+        (coord) => [coord[1], coord[0]]
+      );
+
+      const routeDistance =
+        routeData.features[0].properties.segments[0].distance;
+      setRoute(coordinates);
+      setDistance(routeDistance);
+
+      console.log(`Most efficient itinerary distance: ${routeDistance} meters`);
     } catch (error) {
       console.error("Error fetching data:", error);
+      alert("An error occurred while fetching the route.");
     }
   }
 
@@ -201,3 +198,4 @@ function Search({ origin, setDestination, setPosition, setZoom, setRoute }) {
     </div>
   );
 }
+
