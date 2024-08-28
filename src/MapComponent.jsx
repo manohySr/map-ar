@@ -21,7 +21,16 @@ function MapComponent({ zoom, origin, destination, route }) {
     <MapContainer
       center={origin || [0, 0]} // Fallback center in case origin is not available yet
       zoom={zoom}
-      style={{ height: "100vh", width: "100vw" }}
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+        margin: 0,
+        padding: 0,
+      }}
       whenReady={(map) => {
         mapRef.current = map.target;
       }}
