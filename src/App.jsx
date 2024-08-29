@@ -50,13 +50,21 @@ function App() {
       {showAR ? (
         <>
           {/* AR View */}
-          <ARComponent destination={destination} />
-          <button
-            style={arButton}
-            onClick={() => setShowAR(false)} // Switch back to the map
-          >
-            Back to Map
-          </button>
+          {
+            route ? (
+              <>
+                <ARComponent route={route} />
+                <button
+                  style={arButton}
+                  onClick={() => setShowAR(false)} // Switch back to the map
+                >
+                  Back to Map
+                </button>
+              </>
+            ) : (
+              alert("You haven't entered anything") || setShowAR(false)
+            ) // Show alert and return to map view
+          }
         </>
       ) : (
         <>

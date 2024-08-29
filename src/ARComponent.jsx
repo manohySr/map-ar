@@ -1,3 +1,6 @@
+import { Fragment } from "react";
+import { useEffect } from "react";
+
 const style = {
   position: "absolute",
   top: 0,
@@ -9,13 +12,13 @@ const style = {
   padding: 0,
 };
 
-function ARComponent() {
+function ARComponent({ route }) {
+  const coords = parseCoordinates(route);
+  console.log(coords); // Check the parsed coordinates
+
   return (
     <div style={style}>
-      <script
-        type="text/javascript"
-        src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex-location-only.js"
-      ></script>
+      <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex-location-only.js"></script>
       <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
       <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
@@ -23,28 +26,34 @@ function ARComponent() {
         vr-mode-ui="enabled: false"
         arjs="sourceType: webcam; videoTexture: true; trackingMethod: best; debugUIEnabled: false"
         renderer="antialias: true; alpha: true;"
-        style={{
-          position: "absolute",
-          width: "100vw",
-          height: "100vh",
-          margin: 0,
-          padding: 0,
-        }}
+        style={style}
       >
         <a-camera gps-new-camera="gpsMinDistance: 10;"></a-camera>
-        <a-entity
-          material="color: red"
-          geometry="primitive: box"
-          gps-new-entity-place="latitude: -18.939801; longitude: 47.4347766"
-          scale="1.15 -1.5 5.2"
-        ></a-entity>
-        {/* Add other entities as needed */}
+        {coords.map((coord, index) => (
+          <a-entity
+            key={index}
+            material="color: red"
+            geometry="primitive: box"
+            gps-new-entity-place={`latitude: ${coord.lat}; longitude: ${coord.lon}`}
+            scale="1.15 -1.5 5.2"
+          ></a-entity>
+        ))}
       </a-scene>
     </div>
   );
 }
 
 export default ARComponent;
+
+const parseCoordinates = (data) => {
+  const coordinates = [];
+  for (let i = 0; i < data.length; i += 18) {
+    const lat = parseFloat(data.slice(i, i + 9));
+    const lon = parseFloat(data.slice(i + 9, i + 18));
+    coordinates.push({ lat, lon });
+  }
+  return coordinates;
+};
 
 {
   /* <script type='text/javascript' src='https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex-location-only.js'></script>
