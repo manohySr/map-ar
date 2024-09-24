@@ -8,6 +8,17 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
+const styleMap = {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    overflow: "hidden",
+    margin: 0,
+    padding: 0,
+}
+
 function MapComponent({ zoom, origin, destination, route }) {
   const mapRef = useRef(null);
 
@@ -21,16 +32,7 @@ function MapComponent({ zoom, origin, destination, route }) {
     <MapContainer
       center={origin || [0, 0]} // Fallback center in case origin is not available yet
       zoom={zoom}
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: "100vw",
-        height: "100vh",
-        overflow: "hidden",
-        margin: 0,
-        padding: 0,
-      }}
+      style={styleMap}
       whenReady={(map) => {
         mapRef.current = map.target;
       }}
