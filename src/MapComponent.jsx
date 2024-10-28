@@ -9,15 +9,15 @@ import {
 import "leaflet/dist/leaflet.css";
 
 const styleMap = {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    overflow: "hidden",
-    margin: 0,
-    padding: 0,
-}
+  position: "absolute",
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  overflow: "hidden",
+  margin: 0,
+  padding: 0,
+};
 
 function MapComponent({ zoom, origin, destination, route }) {
   const mapRef = useRef(null);
@@ -51,7 +51,7 @@ function MapComponent({ zoom, origin, destination, route }) {
           <Popup>Destination</Popup>
         </Marker>
       )}
-      {route && <Polyline positions={route} color="blue" />}
+      {route && origin && <Polyline positions={route} color="blue" />}
     </MapContainer>
   );
 }

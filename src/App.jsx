@@ -26,23 +26,39 @@ function App() {
   const [route, setRoute] = useState(null);
   const [showAR, setShowAR] = useState(false);
 
-  useEffect(() => {
-    // Get the user's current location when the component mounts
+  let watchId = null; // To store the ID of the geolocation watcher
+
+  //  to start watching the user's location
+  function startWatchingPosition() {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
+      watchId = navigator.geolocation.watchPosition(
         (position) => {
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
           const userPosition = [latitude, longitude];
-          setOrigin(userPosition);
+          setOrigin(userPosition); // Update origin in real-time
         },
         (error) => {
           console.error(`Error Code = ${error.code}: ${error.message}`);
-        }
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }, // Config options
       );
     } else {
       console.error("Geolocation is not supported by this browser.");
     }
+  }
+
+  // Stop watching when the component unmounts
+  function stopWatchingPosition() {
+    if (watchId) {
+      navigator.geolocation.clearWatch(watchId);
+    }
+  }
+
+  // Start watching position on component mount, and stop on unmount
+  useEffect(() => {
+    startWatchingPosition();
+    return () => stopWatchingPosition(); // Cleanup on unmount
   }, []);
 
   return (
@@ -53,7 +69,7 @@ function App() {
           {
             route ? (
               <>
-                <ARComponent route={route} />
+                <ARComponent route={route} origin={origin} />
                 <button
                   style={arButton}
                   onClick={() => setShowAR(false)} // Switch back to the map
